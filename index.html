@@ -1,0 +1,35 @@
+<div id="battle-scene">
+  <div class="hud">
+    <div class="health-box">
+      <div class="name">KAKASHI</div>
+      <div class="bar"><div id="hp-kakashi" class="fill"></div></div>
+    </div>
+    <div class="vs">VS</div>
+    <div class="health-box">
+      <div class="name">OBITO (IA)</div>
+      <div class="bar"><div id="hp-obito" class="fill"></div></div>
+    </div>
+  </div>
+
+  <div class="arena">
+    <div class="char" id="kakashi">
+      <div class="aura blue-aura"></div>
+      <div class="sprite">⚡</div>
+    </div>
+
+    <div class="char" id="obito">
+      <div class="aura red-aura"></div>
+      <div class="sprite">👁️</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button id="btn-atacar" onclick="turnoJogador()">USAR CHIDORI</button>
+    <div id="msg">Sua vez!</div>
+  </div>
+
+  <div id="overlay">
+    <h1 id="winner-text"></h1>
+    <button onclick="location.reload()">REVANCHE</button>
+  </div>
+</div>
