@@ -1,0 +1,54 @@
+#battle-scene {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  background: #111;
+  color: white;
+  font-family: 'Segoe UI', sans-serif;
+  overflow: hidden;
+}
+
+.hud { display: flex; justify-content: space-around; padding: 20px; }
+.health-box { width: 40%; }
+.bar { width: 100%; height: 12px; background: #333; border: 2px solid #eee; margin-top: 5px; }
+.fill { height: 100%; width: 100%; background: #2ecc71; transition: width 0.5s ease; }
+
+.arena {
+  display: flex; justify-content: center; align-items: center;
+  height: 180px; gap: 120px;
+}
+
+.char { position: relative; font-size: 60px; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+/* AURAS DETALHADAS */
+.aura {
+  position: absolute; top: -10px; left: -10px; width: 80px; height: 80px;
+  border-radius: 50%; filter: blur(15px); opacity: 0.6; z-index: -1;
+  animation: pulse 1.5s infinite alternate;
+}
+.blue-aura { background: #00d4ff; box-shadow: 0 0 40px #00d4ff; }
+.red-aura { background: #ff0000; box-shadow: 0 0 40px #ff0000; }
+
+@keyframes pulse {
+  from { transform: scale(1); opacity: 0.4; }
+  to { transform: scale(1.4); opacity: 0.8; }
+}
+
+/* ANIMAÇÕES DE IMPACTO */
+.shake { animation: shakeAnim 0.3s; }
+@keyframes shakeAnim {
+  0%, 100% { transform: translate(0,0); }
+  25% { transform: translate(8px, 8px); }
+  50% { transform: translate(-8px, -8px); }
+  75% { transform: translate(8px, -8px); }
+}
+
+.flash { filter: brightness(10) contrast(2); }
+
+.controls { text-align: center; margin-top: 20px; }
+#msg { margin-top: 10px; font-weight: bold; color: #aaa; }
+
+#overlay {
+  display: none; position: absolute; top: 0; background: rgba(0,0,0,0.85);
+  width: 100%; height: 100%; flex-direction: column; justify-content: center; align-items: center;
+}
