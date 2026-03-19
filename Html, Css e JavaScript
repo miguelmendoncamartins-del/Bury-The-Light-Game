@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>SBR: Johnny vs Valentine</title>
+    <style>
+        #battle-scene {
+            position: relative;
+            width: 100%;
+            height: 450px;
+            background: linear-gradient(to bottom, #1a0f00, #4d2600);
+            color: white;
+            font-family: 'Verdana', sans-serif;
+            overflow: hidden;
+            border: 4px solid #ffd700;
+        }
+
+        .hud { display: flex; justify-content: space-around; padding: 20px; background: rgba(0,0,0,0.5); }
+        .health-box { width: 40%; }
+        .name { font-weight: bold; letter-spacing: 2px; text-shadow: 2px 2px #000; }
+        .bar { width: 100%; height: 15px; background: #333; border: 1px solid #fff; margin-top: 5px; border-radius: 5px; }
+        .fill { height: 100%; width: 100%; background: #e74c3c; transition: width 0.4s ease; }
+        #hp-johnny { background: #3498db; }
+
+        .arena { display: flex; justify-content: center; align-items: center; height: 200px; gap: 150px; }
+        .char { position: relative; font-size: 70px; transition: 0.3s; z-index: 2; }
+        
+        /* AURAS */
+        .aura { position: absolute; top: -10px; left: -10px; width: 90px; height: 90px; border-radius: 50%; filter: blur(20px); opacity: 0.5; z-index: -1; animation: pulse 1.5s infinite alternate; }
+        .blue-aura { background: #3498db; box-shadow: 0 0 50px #3498db; }
+        .gold-aura { background: #ffd700; box-shadow: 0 0 50px #ffd700; }
+
+        @keyframes pulse { from { transform: scale(1); opacity: 0.3; } to { transform: scale(1.5); opacity: 0.7; } }
+
+        /* CONTROLES */
+        .controls { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 10px; 
+            padding: 10px; 
+            background: rgba(0,0,0,0.7);
+        }
+        button { 
+            padding: 10px; 
+            background: #444; 
+            color: white; 
+            border: 1px solid #ffd700; 
+            cursor: pointer;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        button:hover { background: #666; }
+        #msg { grid-column: span 2; text-align: center; color: #ffd700; font-weight: bold; min-height: 20px; }
+
+        /* ANIMAÇÕES */
+        .shake { animation: shakeAnim 0.3s; }
+        .flash { filter: brightness(5) contrast(2); }
+        .dodge { transform: translateY(-50px) !important; opacity: 0.5; }
+        
+        @keyframes shakeAnim {
+            0%, 100% { transform: translate(0,0); }
+            25% { transform: translate(10px, 0); }
+            75% { transform: translate(-10px, 0); }
+        }
+
+        #overlay {
+            display: none; position: absolute; top: 0; background: rgba(0,0,0,0.9);
+            width: 100%; height: 100%; flex-direction: column; justify-content: center; align-items: center; z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+<div id="battle-scene">
+  <div class="hud">
+    <div class="health-box">
+      <div class="name">JOHNNY JOESTAR</div>
+      <div class="bar"><div id="hp-johnny" class="fill"></div></div>
+    </div>
+    <div class="vs">VS</div>
+    <div class="health-box">
+      <div class="name">FUNNY VALENTINE</div>
+      <div class="bar"><div id="hp-valentine" class="fill"></div></div>
+    </div>
+  </div>
+
+  <div class="arena">
+    <div class="char" id="johnny">
+      <div class="aura blue-aura"></div>
+      <div class="sprite">🏇</div>
+    </div>
+    <div class="char" id="valentine">
+      <div class="aura gold-aura"></div>
+      <div class="sprite">🐰</div>
+    </div>
+  </div>
+
+  <div id="msg">Sua vez, Johnny!</div>
+  <div class="controls">
+    <button onclick="ataqueJogador('ACT 1', 12, 0.1)">Tusk ACT 1</button>
+    <button onclick="ataqueJogador('ACT 2', 18, 0.2)">Tusk ACT 2</button>
+    <button onclick="ataqueJogador('ACT 3', 25, 0.3)">Tusk ACT 3</button>
+    <button onclick="ataqueJogador('ACT 4', 45, 0.5)">O INFINITO (ACT 4)</button>
+  </div>
+
+  <div id="overlay">
+    <h1 id="winner-text"></h1>
+    <button onclick="location.reload()">RECOMEÇAR CORRIDA</button>
+  </div>
+</div>
+
+<script>
+let hp = { johnny: 100, valentine: 100 };
+let bloqueado = false;
+
+// Configurações da IA
+const ataquesIA = [
+    { nome: "D4C Socos", dano: 12, crit: 0.1 },
+    { nome: "Troca de Dimensão", dano: 18, crit: 0.2 },
+    { nome: "Bandeira dos EUA", dano: 25, crit: 0.3 },
+    { nome: "LOVE TRAIN", dano: 40, crit: 0.4 }
+];
+
+function ataqueJogador(nomeAtk, power, critChance) {
+    if (bloqueado || hp.johnny <= 0) return;
+    bloqueado = true;
+    
+    document.getElementById('msg').innerText = "Johnny usou " + nomeAtk + "!";
+    executarAcao('johnny', 'valentine', power, critChance, () => {
+        if (hp.valentine > 0) {
+            setTimeout(turnoIA, 1000);
+        }
+    });
+}
+
+function turnoIA() {
+    const atk = ataquesIA[Math.floor(Math.random() * ataquesIA.length)];
+    document.getElementById('msg').innerText = "Valentine usou " + atk.nome + "!";
+    
+    executarAcao('valentine', 'johnny', atk.dano, atk.crit, () => {
+        if (hp.johnny > 0) {
+            bloqueado = false;
+            document.getElementById('msg').innerText = "Sua vez!";
+        }
+    });
+}
+
+function executarAcao(idAtacante, idAlvo, power, critChance, callback) {
+    const atacante = document.getElementById(idAtacante);
+    const alvo = document.getElementById(idAlvo);
+    const cena = document.getElementById('battle-scene');
+
+    // Lógica de Esquiva (20% de chance para qualquer um)
+    const esquivou = Math.random() < 0.20;
+    
+    // Dash visual
+    const direcao = idAtacante === 'johnny' ? 80 : -80;
+    atacante.style.transform = `translateX(${direcao}px) scale(1.2)`;
+
+    setTimeout(() => {
+        if (esquivou) {
+            document.getElementById('msg').innerText += "... mas ERROU!";
+            alvo.classList.add('dodge');
+            setTimeout(() => {
+                alvo.classList.remove('dodge');
+                finalizarTurno(atacante, callback);
+            }, 400);
+            return;
+        }
+
+        // Lógica de Crítico
+        const eCritico = Math.random() < critChance;
+        let danoFinal = eCritico ? power * 1.8 : power;
+        danoFinal = Math.floor(danoFinal + (Math.random() * 5));
+
+        if (eCritico) document.getElementById('msg').innerText += " - CRÍTICO!";
+
+        // Aplicar Dano
+        hp[idAlvo] = Math.max(0, hp[idAlvo] - danoFinal);
+        document.getElementById(`hp-${idAlvo}`).style.width = hp[idAlvo] + "%";
+        
+        // Efeitos Visuais
+        cena.classList.add('shake');
+        alvo.classList.add('flash');
+
+        setTimeout(() => {
+            cena.classList.remove('shake');
+            alvo.classList.remove('flash');
+            
+            if (hp[idAlvo] <= 0) {
+                finalizarLuta(idAtacante);
+            } else {
+                finalizarTurno(atacante, callback);
+            }
+        }, 300);
+    }, 300);
+}
+
+function finalizarTurno(atacante, callback) {
+    atacante.style.transform = "translateX(0) scale(1)";
+    callback();
+}
+
+function finalizarLuta(vencedorId) {
+    const tela = document.getElementById('overlay');
+    const texto = document.getElementById('winner-text');
+    tela.style.display = 'flex';
+    texto.innerText = (vencedorId === 'johnny' ? "JOHNNY VENCEU O PRESIDENTE!" : "VALENTINE CONSTRUIU O MUNDO PERFEITO!");
+}
+</script>
+</body>
+</html>
